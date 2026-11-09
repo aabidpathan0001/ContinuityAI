@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ContinuityAI – Handover dashboard</title>
+<style>
+:root{--navy:#0B1F3A;--navy2:#16345C;--teal:#0A7A76;--tealbg:#E3F4F3;--bg:#F6F8FB;--card:#fff;--line:#E1E6EE;--text:#1F2937;--muted:#4B5563;--red:#9B1C12;--redbg:#FDE8E6;--green:#14633A;--greenbg:#E2F5EA;--amber:#7A4F0B;--amberbg:#FDF3DC;--gray:#3F4856;--graybg:#E8EBF0}
+*{box-sizing:border-box}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--text);background:var(--bg)}button,input,textarea,select{font:inherit}button{cursor:pointer}:focus-visible{outline:3px solid #3B82C4;outline-offset:2px}
+.app{display:flex;min-height:100vh}.side{width:220px;flex:none;background:var(--navy);color:#DCE6F2;padding:22px 14px;display:flex;flex-direction:column;gap:4px}.brand{color:#fff;font-weight:700;font-size:19px;padding:0 10px 18px}.nav{background:none;border:0;color:#DCE6F2;text-align:left;padding:10px 12px;border-radius:8px;min-height:44px}.nav:hover{background:var(--navy2)}.nav.active{background:var(--navy2);color:#fff;font-weight:600}
+.main{flex:1;min-width:0;padding:24px 32px;display:flex;flex-direction:column;gap:20px}.top{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}.top small{color:var(--muted)}h1{margin:0;font-size:24px;color:var(--navy)}h2{margin:0 0 10px;font-size:16px;color:var(--navy)}h3{color:var(--navy)}.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+select,.input,.btn{min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #CBD2DC;background:#fff;color:var(--navy);font-weight:600}.input{width:100%;font-weight:400}.btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}.btn.sel{background:var(--tealbg);border-color:var(--teal);color:#075552}.btn.danger{border-color:#E6B7B2;color:var(--red)}.btn:disabled{opacity:.55;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}.stat b{display:block;font-size:28px;color:var(--navy)}.stat span{color:var(--muted);font-size:13px}.cols{display:grid;grid-template-columns:minmax(0,2fr) minmax(250px,1fr);gap:20px;align-items:start}.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.chip{min-height:36px;padding:0 14px;border-radius:99px;border:1px solid #CBD2DC;background:#fff;color:var(--navy)}.chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}.list{display:flex;flex-direction:column;gap:14px}.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700}.conflict{background:var(--redbg);color:var(--red)}.supported{background:var(--greenbg);color:var(--green)}.single{background:var(--amberbg);color:var(--amber)}.gap{background:var(--graybg);color:var(--gray)}.verified{background:var(--greenbg);color:var(--green)}
+.meta{color:var(--muted);font-size:12px;margin-left:8px}.title{font-size:16px;font-weight:600;color:var(--navy);margin:8px 0}.ev{background:#F3F5F8;border-radius:8px;padding:10px;margin:8px 0;font-size:13px}.note{color:var(--muted);font-size:13px}.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.plan h3{margin:12px 0 2px;font-size:12px;color:var(--teal)}.plan p{margin:0;font-size:13px}.ruled{color:var(--green);font-weight:600;margin-top:10px}.log{list-style:none;margin:0;padding:0}.log li{padding:10px 0;border-bottom:1px solid var(--line)}.log time{color:var(--muted);font-size:12px;margin-right:8px}.hidden{display:none!important}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.muted{color:var(--muted)}.small{font-size:12px}.field{margin-bottom:14px}.field label{display:block;font-weight:700;color:var(--navy);margin-bottom:6px}.textarea{width:100%;min-height:90px;padding:12px;border:1px solid #CBD2DC;border-radius:8px;resize:vertical}.drop{border:2px dashed #B8C4D4;border-radius:12px;padding:28px;text-align:center;background:#FBFCFE}.drop.drag{background:var(--tealbg);border-color:var(--teal)}.file-row{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:10px 0}.progress{height:9px;background:#E8EBF0;border-radius:99px;overflow:hidden}.progress>i{display:block;height:100%;width:0;background:var(--teal);transition:width .25s}.step{display:flex;gap:10px;align-items:center;padding:8px 0}.step-dot{width:22px;height:22px;border-radius:50%;background:#E8EBF0;display:grid;place-items:center;font-size:12px}.step.done .step-dot{background:var(--greenbg);color:var(--green)}.step.active .step-dot{background:var(--tealbg);color:var(--teal)}.state-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.state-item{border-left:4px solid #CBD2DC;padding-left:12px}.state-item.done{border-color:var(--green)}.state-item.progressing{border-color:var(--teal)}.state-item.pending{border-color:var(--amber)}.state-item.blocked{border-color:var(--red)}.timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.timeline .card h3{margin-top:0;color:var(--teal)}.callout{padding:12px;border-radius:8px;background:var(--amberbg);color:var(--amber);margin:10px 0}.success{padding:12px;border-radius:8px;background:var(--greenbg);color:var(--green);margin:10px 0}.package{max-width:1000px;margin:auto}.package h1{margin-bottom:4px}.package .package-head{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:18px}.package section{margin:18px 0}.package ul{padding-left:20px}.print-only{display:none}.role-pill{display:inline-block;padding:5px 10px;border-radius:99px;background:var(--tealbg);color:#075552;font-weight:700;font-size:12px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}#toast.show{opacity:1}
+@media(max-width:860px){.app{flex-direction:column}.side{width:auto;flex-direction:row;flex-wrap:wrap;padding:12px}.brand{width:100%;padding:0 6px 6px}.cols{grid-template-columns:1fr}.main{padding:16px}.timeline{grid-template-columns:1fr}}
+@media print{.side,.actions,.no-print{display:none!important}.main{padding:0}.print-only{display:block}.card{box-shadow:none}.package{max-width:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="side" aria-label="Main">
+  <div class="brand">ContinuityAI</div>
+  <button class="nav active" data-view="dashboard">Dashboard</button>
+  <button class="nav" data-view="overview">Project knowledge</button>
+  <button class="nav" data-view="sources">Sources</button>
+  <button class="nav" data-view="conflicts">Conflicts (<span id="navConf">0</span>)</button>
+  <button class="nav" data-view="gaps">Knowledge gaps</button>
+  <button class="nav" data-view="review">Review</button>
+  <button class="nav" data-view="package">Final package</button>
+  <button class="nav" data-view="audit">Audit log</button>
+</nav>
+<main class="main">
+<header class="top">
+  <div><small id="projectLabel">ContinuityAI workspace</small><h1 id="pageTitle">Project dashboard</h1></div>
+  <div class="actions" id="globalActions"></div>
+</header>
+
+<section id="view-dashboard">
+  <div class="stats" id="dashboardStats"></div>
+  <div class="cols">
+    <div class="card">
+      <div class="section-title"><h2>Projects</h2><button class="btn primary" id="newProjectBtn">New Project</button></div>
+      <div id="projectList" class="list"></div>
+    </div>
+    <aside class="card">
+      <h2>Workflow</h2>
+      <div class="step done"><span class="step-dot">1</span><div><b>CONNECT</b><div class="small muted">Add authorised project sources</div></div></div>
+      <div class="step done"><span class="step-dot">2</span><div><b>RECONSTRUCT</b><div class="small muted">Build structured project knowledge</div></div></div>
+      <div class="step active"><span class="step-dot">3</span><div><b>VERIFY</b><div class="small muted">Evidence, conflicts and gaps</div></div></div>
+      <div class="step"><span class="step-dot">4</span><div><b>REVIEW</b><div class="small muted">Human approval</div></div></div>
+      <div class="step"><span class="step-dot">5</span><div><b>CONTINUE</b><div class="small muted">Role-aware package and next steps</div></div></div>
+    </aside>
+  </div>
+</section>
+
+<section id="view-new" class="hidden">
+  <div class="card">
+    <h2>New project</h2>
+    <div class="field"><label for="newName">Project name</label><input class="input" id="newName" value="E-Commerce Platform"></div>
+    <div class="field"><label for="newDesc">Project description</label><textarea class="textarea" id="newDesc">Project handover for an e-commerce platform.</textarea></div>
+    <div class="field"><label for="newRole">Recipient role</label><select id="newRole" class="input"><option>Incoming engineer</option><option>Product manager</option><option>Team lead</option><option>Designer</option><option>Other</option></select></div>
+    <div class="drop" id="drop"><b>Upload project sources</b><p class="muted">TXT, Markdown, CSV and JSON. PDF can be added later without changing the workflow.</p><input id="fileInput" type="file" multiple accept=".txt,.md,.markdown,.csv,.json,text/plain,text/markdown,application/json,text/csv"></div>
+    <div id="newFiles" class="card" style="margin-top:14px"></div>
+    <div class="row"><button class="btn" id="loadDemo">Load Demo Project</button><button class="btn primary" id="createProject">Create & Analyze Project</button></div>
+  </div>
+</section>
+
+<section id="view-processing" class="hidden">
+  <div class="card">
+    <h2>Analyzing project...</h2><p class="muted">Processing is deterministic for this MVP and is structured so a real AI provider can be connected later.</p>
+    <div class="progress"><i id="progressBar"></i></div>
+    <div id="processingSteps"></div>
+  </div>
+</section>
+
+<section id="view-overview" class="hidden">
+  <div class="stats" id="overviewStats"></div>
+  <div class="cols">
+    <div>
+      <div class="card">
+        <div class="section-title"><h2>Current project state</h2><span class="role-pill" id="overviewRole"></span></div>
+        <div class="state-grid" id="stateGrid"></div>
+      </div>
+      <div class="card" style="margin-top:14px"><h2>Knowledge items</h2><div class="chips" id="chips"></div><div class="list" id="claims"></div></div>
+    </div>
+    <aside class="card plan"><h2>Continuation plan</h2><div id="plan"></div><p class="note" style="margin-top:14px">Role-aware content is generated from the approved project state and evidence.</p></aside>
+  </div>
+</section>
+
+<section id="view-sources" class="hidden">
+  <div class="card">
+    <div class="section-title">
+      <h2>Project sources</h2>
+      <div>
+        <input id="sourceInput" type="file" multiple accept=".txt,.md,.markdown,.csv,.json,text/plain,text/markdown,application/json,text/csv" style="display:none">
+        <button class="btn primary" id="addMoreBtn">Add Source</button>
+      </div>
+    </div>
+    <div id="sourceList"></div>
+  </div>
+</section>
+
+<section id="view-conflicts" class="hidden"><div class="card"><h2>Conflict inbox</h2><p class="note">ContinuityAI never silently picks a winner. A reviewer must rule on conflicting evidence.</p><div class="list" id="conflictList"></div></div></section>
+
+<section id="view-gaps" class="hidden">
+  <div class="card"><div class="section-title"><div><h2>Knowledge gaps</h2><p class="note">Information not found in authorised sources remains explicitly uncertain.</p></div><button class="btn primary" id="exitQuestionsBtn">Generate Exit Questions</button></div><div class="list" id="gapList"></div></div>
+  <div class="card hidden" id="questionsCard" style="margin-top:14px"><h2>Exit questions</h2><ol id="questions"></ol></div>
+</section>
+
+<section id="view-review" class="hidden">
+  <div class="card"><h2>Human review</h2><div id="reviewSummary"></div><div class="row"><button class="btn primary" id="approve">Approve Continuity Package</button></div></div>
+</section>
+
+<section id="view-package" class="hidden">
+  <div class="card package" id="packageContent"></div>
+</section>
+
+<section id="view-audit" class="hidden"><div class="card"><h2>Audit log</h2><ul class="log" id="log"></ul></div></section>
+</main></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const DEMO_SOURCES = [
+ {name:"architecture_notes.md",type:"Markdown",content:"# Architecture\nWe will not store card data ourselves. We will use the provider's hosted checkout.\nDatabase: PostgreSQL.\nProduct API is REST."},
+ {name:"roadmap.md",type:"Markdown",content:"# Roadmap\nLaunch target: 2 May\nPayment retry hardening is planned before launch."},
+ {name:"tasks.csv",type:"CSV",content:"id,title,status,assignee\n7,Fix payment retry,Done,Rahul\n8,Deployment,Pending,Aisha\n9,Security testing,Pending,Meera"},
+ {name:"meeting_2026-02-20.md",type:"Markdown",content:"# Meeting\nAgreed to use the provider's hosted checkout.\nAuthentication and database work are complete."},
+ {name:"meeting_2026-03-12.md",type:"Markdown",content:"# Meeting\nLine 14: retry is still not idempotent, we should not call this finished.\nLine 30: we are aiming for 15 April.\nPayment retry must be verified in production."},
+ {name:"changelog.txt",type:"TXT",content:"v0.9\nRemember to rebuild the search index after each catalogue import."}
+];
+
+const state = {
+ projects: JSON.parse(localStorage.getItem("continuityai_projects") || "null") || [],
+ currentId: localStorage.getItem("continuityai_current") || null,
+ filter:"all",
+ newFiles:[],
+ processing:false
+};
+
+function uid(){return "p_"+Date.now()+"_"+Math.random().toString(36).slice(2,7)}
+function save(){localStorage.setItem("continuityai_projects",JSON.stringify(state.projects));if(state.currentId)localStorage.setItem("continuityai_current",state.currentId)}
+function current(){return state.projects.find(p=>p.id===state.currentId)}
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2600)}
+function logEvent(msg){const p=current();if(!p)return;p.audit=p.audit||[];p.audit.unshift({time:new Date().toLocaleString(),msg});save();renderAudit()}
+function openConflicts(){const p=current();return p?p.conflicts.filter(c=>!c.ruling).length:0}
+function show(view){
+ document.querySelectorAll("main section[id^=view-]").forEach(s=>s.classList.add("hidden"));
+ $("view-"+view).classList.remove("hidden");
+ document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
+ $("pageTitle").textContent={dashboard:"Project dashboard",overview:"Project knowledge",sources:"Sources",conflicts:"Conflicts",gaps:"Knowledge gaps",review:"Human review",package:"Final continuity package",audit:"Audit log",new:"New project",processing:"Project analysis"}[view]||"ContinuityAI";
+ const p=current(); $("projectLabel").textContent=p?(p.demo?"Synthetic demo project":p.name):"ContinuityAI workspace";
+ renderAll();
+}
+function blankProject(name,desc,role,sources,demo=false){
+ return {id:uid(),name,desc,role,sources:sources.map((s,i)=>({...s,id:"s"+i,status:"Processed",items:0})),claims:[],conflicts:[],gaps:[],state:[],plan:{day1:"Review the highest-risk unresolved work and verify the latest production state.",week1:"Review architecture, active tasks and evidence with the project owner.",month1:"Close knowledge gaps and publish the next approved handover version."},approved:false,version:"0.1",audit:[],demo}
+}
+function demoProject(){
+ const p=blankProject("E-Commerce Platform","Synthetic project used to demonstrate evidence-backed handover.","Incoming engineer",DEMO_SOURCES,true);
+ p.claims=[
+  {id:1,state:"conflict",type:"Risk",title:"Payment retry is unresolved and can charge a customer twice.",evidence:[{src:"meeting_2026-03-12.md",loc:"lines 14-16",quote:"retry is still not idempotent, we should not call this finished"},{src:"tasks.csv",loc:"row 2",quote:"Fix payment retry, status = Done, assignee = Rahul"}],note:"Owner: Rahul. Gap: no failure rate in any source.",conflictId:"c1"},
+  {id:2,state:"supported",type:"Decision",title:"Orders use a managed payment provider instead of in-house card handling.",evidence:[{src:"architecture_notes.md",loc:"architecture section",quote:"We will not store card data ourselves. We will use the provider's hosted checkout."},{src:"meeting_2026-02-20.md",loc:"meeting note",quote:"Agreed to use the provider's hosted checkout."}],note:"Two agreeing sources."},
+  {id:3,state:"conflict",type:"Dependency",title:"Launch date is not consistent across sources.",evidence:[{src:"roadmap.md",loc:"roadmap",quote:"Launch target: 2 May"},{src:"meeting_2026-03-12.md",loc:"meeting note",quote:"we are aiming for 15 April"}],note:"Needs a human ruling.",conflictId:"c2"},
+  {id:4,state:"single",type:"Action",title:"Search index must be rebuilt after each catalogue import.",evidence:[{src:"changelog.txt",loc:"line 3",quote:"Remember to rebuild the search index after each catalogue import."}],note:"Only one source mentions this."},
+  {id:5,state:"gap",type:"Open question",title:"Who owns the vendor contract renewal? Not found in authorised sources.",evidence:[],note:"Added to exit questions for the departing member."}
+ ];
+ p.conflicts=[
+  {id:"c1",claimId:1,title:"Payment retry: sources disagree",a:p.claims[0].evidence[0],b:p.claims[0].evidence[1],aSays:"work is unresolved",bSays:"work is done",question:"Did the retry fix reach production, and was idempotency ever tested?"},
+  {id:"c2",claimId:3,title:"Launch date: sources disagree",a:p.claims[2].evidence[0],b:p.claims[2].evidence[1],aSays:"launch on 2 May",bSays:"launch on 15 April",question:"Which launch date is the current commitment?"}
+ ];
+ p.gaps=[{id:"g1",title:"Who owns the vendor contract renewal?",status:"Open"},{id:"g2",title:"Has payment retry been tested in production?",status:"Open"}];
+ p.state=[
+  {status:"done",title:"Authentication",detail:"Completed"},
+  {status:"done",title:"Database",detail:"PostgreSQL configured"},
+  {status:"done",title:"Product API",detail:"REST API available"},
+  {status:"progressing",title:"Payment integration",detail:"Retry/idempotency needs verification"},
+  {status:"pending",title:"Deployment",detail:"Not completed"},
+  {status:"pending",title:"Security testing",detail:"Not completed"},
+  {status:"blocked",title:"Production deployment",detail:"Blocked by payment verification"}
+ ];
+ p.sources.forEach((s,i)=>s.items=i===0?3:i===2?3:1);
+ p.version="0.9";
+ p.audit=[{time:new Date().toLocaleString(),msg:"Synthetic demo project loaded from 6 authorised sources"}];
+ return p;
+}
+function analyseSources(p){
+ const all=p.sources.map(s=>s.content||"").join("\n").toLowerCase();
+ if(p.demo)return p;
+ p.claims=[];p.conflicts=[];p.gaps=[];p.state=[];
+ const add=(title,type,state,evidence,note="")=>p.claims.push({id:Date.now()+Math.random(),title,type,state,evidence,note});
+ p.sources.forEach(s=>{
+  const c=s.content||"";
+  if(/password|secret|api[_ -]?key/i.test(c)){} 
+  const lines=c.split(/\r?\n/).filter(Boolean);
+  s.items=Math.max(1,Math.min(10,lines.length));
+ });
+ const hasPayment=/payment|checkout|stripe|provider/i.test(all);
+ const hasDeploy=/deploy|production/i.test(all);
+ if(hasPayment)add("Payment and checkout are documented in the connected sources.","Project knowledge","single",[{src:p.sources.find(s=>/payment|checkout|arch/i.test(s.content||""))?.name||p.sources[0]?.name,loc:"source content",quote:"Payment/checkout reference found in uploaded source."}]);
+ if(hasDeploy)add("Deployment information is present in the connected sources.","Project knowledge","single",[{src:p.sources.find(s=>/deploy|production/i.test(s.content||""))?.name||p.sources[0]?.name,loc:"source content",quote:"Deployment/production reference found in uploaded source."}]);
+ if(!hasPayment)add("Payment ownership and production status are not established.","Open question","gap",[],"No supporting evidence found in uploaded sources.");
+ if(!hasDeploy)add("Deployment status is not established.","Open question","gap",[],"No supporting evidence found in uploaded sources.");
+ p.gaps=p.claims.filter(c=>c.state==="gap").map((c,i)=>({id:"g"+i,title:c.title,status:"Open"}));
+ p.state=[
+  {status:hasPayment?"progressing":"pending",title:"Payment / checkout",detail:hasPayment?"Evidence found; verify current state":"No evidence found"},
+  {status:hasDeploy?"progressing":"pending",title:"Deployment",detail:hasDeploy?"Evidence found; verify current state":"No evidence found"}
+ ];
+ p.plan={day1:"Read supported claims and resolve any conflicts before changing project code.",week1:"Verify active work against the source evidence and close the highest-priority gaps.",month1:"Collect remaining owner/decision information and publish a new approved package."};
+ return p;
+}
+function renderDashboard(){
+ const total=state.projects.length;
+ $("dashboardStats").innerHTML=[[""+total,"Projects"],[""+state.projects.reduce((n,p)=>n+p.sources.length,0),"Sources"],[""+state.projects.reduce((n,p)=>n+p.claims.length,0),"Knowledge items"],[""+state.projects.reduce((n,p)=>n+p.conflicts.filter(c=>!c.ruling).length,0),"Open conflicts"]].map(x=>`<div class="card stat"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("");
+ $("projectList").innerHTML=state.projects.map(p=>`<article class="card"><div class="section-title"><div><h3 style="margin:0">${esc(p.name)}</h3><div class="small muted">${esc(p.desc)}</div></div><span class="badge ${p.approved?"supported":"single"}">${p.approved?"Approved":"In Review"}</span></div><p class="small">${p.sources.length} sources · ${p.claims.length} knowledge items · ${p.conflicts.filter(c=>!c.ruling).length} conflicts · ${p.gaps.filter(g=>g.status==="Open").length} gaps</p><div class="row"><button class="btn" data-open-project="${p.id}">Open Project</button></div></article>`).join("")||`<div class="card note">No projects yet. Create one or load the synthetic demo.</div>`;
+}
+function renderHeaderActions(){
+ const p=current();
+ $("globalActions").innerHTML=p?`<label class="note" for="role">Recipient role</label><select id="role"><option>Incoming engineer</option><option>Product manager</option><option>Team lead</option><option>Designer</option><option>Other</option></select><button class="btn primary" id="headerReview">Review</button>`:"";
+ if(p){$("role").value=p.role; $("role").onchange=e=>{p.role=e.target.value;save();logEvent("Recipient role changed to: "+p.role);renderAll()};$("headerReview").onclick=()=>show("review")}
+}
+function renderStats(){
+ const p=current(); if(!p)return;
+ const vals=[p.claims.length,p.conflicts.filter(c=>!c.ruling).length,p.gaps.filter(g=>g.status==="Open").length,p.claims.filter(c=>c.state==="supported").length];
+ $("overviewStats").innerHTML=vals.map((v,i)=>`<div class="card stat"><b>${v}</b><span>${["Knowledge items","Open conflicts","Knowledge gaps","Supported by 2+ sources"][i]}</span></div>`).join("");
+ $("navConf").textContent=p.conflicts.filter(c=>!c.ruling).length;
+}
+function renderState(){
+ const p=current();if(!p)return;
+ $("overviewRole").textContent=p.role;
+ $("stateGrid").innerHTML=p.state.map(s=>`<div class="state-item ${s.status}"><b>${esc(s.title)}</b><div class="small muted">${esc(s.detail)}</div></div>`).join("")||`<div class="note">Run project analysis to reconstruct the current state.</div>`;
+}
+function renderClaims(){
+ const p=current();if(!p)return;
+ const opts=[["all","All"],["conflict","Conflicts"],["supported","Supported"],["single","Single-source"],["gap","Gaps"]];
+ $("chips").innerHTML=opts.map(([k,l])=>`<button class="chip ${state.filter===k?"on":""}" data-f="${k}">${l}</button>`).join("");
+ const items=p.claims.filter(c=>state.filter==="all"||c.state===state.filter);
+ $("claims").innerHTML=items.map(c=>`<article class="card"><span class="badge ${c.state}">${c.state==="gap"?"KNOWLEDGE GAP":c.state.toUpperCase()}</span><span class="meta">${esc(c.type)}</span><div class="title">${esc(c.title)}</div>${(c.evidence||[]).map(e=>`<div class="ev"><b>${esc(e.src)}</b> (${esc(e.loc)})<br>"${esc(e.quote)}"</div>`).join("")}<div class="note">${esc(c.note||"")}</div>${c.conflictId?`<div class="row"><button class="btn" data-open-conf="${c.conflictId}">Open conflict</button></div>`:""}</article>`).join("")||`<div class="card note">No items in this view.</div>`;
+}
+function renderPlan(){
+ const p=current();if(!p)return;
+ $("plan").innerHTML=`<h3>DAY 1</h3><p>${esc(p.plan.day1)}</p><h3>WEEK 1</h3><p>${esc(p.plan.week1)}</p><h3>MONTH 1</h3><p>${esc(p.plan.month1)}</p>`;
+}
+function renderSources(){
+ const p=current();if(!p)return;
+ $("sourceList").innerHTML=p.sources.map(s=>`<div class="file-row"><div><b>${esc(s.name)}</b><div class="small muted">${esc(s.type)} · ${s.status||"Pending"} · ${s.items||0} extracted knowledge items</div></div><button class="btn danger" data-remove-source="${s.id}">Remove</button></div>`).join("")||`<p class="note">No sources connected.</p>`;
+}
+function renderConflicts(){
+ const p=current();if(!p)return;
+ $("conflictList").innerHTML=p.conflicts.map(c=>`<article class="card"><h2>${esc(c.title)}</h2><div class="two"><div class="ev"><b>Source A: ${esc(c.a.src)}</b> (${esc(c.a.loc)})<br>"${esc(c.a.quote)}"<br><span class="note">Says: ${esc(c.aSays)}</span></div><div class="ev"><b>Source B: ${esc(c.b.src)}</b> (${esc(c.b.loc)})<br>"${esc(c.b.quote)}"<br><span class="note">Says: ${esc(c.bSays)}</span></div></div>${c.ruling?`<div class="ruled">Ruling saved: ${esc(c.ruling)}</div>`:`<div class="row"><button class="btn" data-rule="${c.id}|Source A is correct">Source A is correct</button><button class="btn" data-rule="${c.id}|Source B is correct">Source B is correct</button><button class="btn sel" data-rule="${c.id}|Asked the leaver: ${esc(c.question)}">Ask the leaver</button></div><p class="note">Draft question: ${esc(c.question)} The AI never picks a winner.</p>`}</article>`).join("")||`<div class="card note">No conflicts detected.</div>`;
+}
+function renderGaps(){
+ const p=current();if(!p)return;
+ $("gapList").innerHTML=p.gaps.map(g=>`<article class="card"><span class="badge gap">${esc(g.status).toUpperCase()}</span><div class="title">${esc(g.title)}</div><div class="row">${g.status==="Open"?`<button class="btn" data-gap="${g.id}">Mark Resolved</button><button class="btn" data-gap-unknown="${g.id}">Still Unknown</button>`:`<span class="ruled">Recorded as ${esc(g.status)}</span>`}</div></article>`).join("")||`<div class="card note">No knowledge gaps detected.</div>`;
+}
+function renderReview(){
+ const p=current();if(!p)return;
+ const open=p.conflicts.filter(c=>!c.ruling).length, gaps=p.gaps.filter(g=>g.status==="Open").length;
+ $("reviewSummary").innerHTML=`<div class="state-grid"><div class="card"><b>Current state</b><p>${p.state.length} state items</p></div><div class="card"><b>Evidence</b><p>${p.claims.reduce((n,c)=>n+(c.evidence||[]).length,0)} evidence references</p></div><div class="card"><b>Conflicts</b><p>${open?`<span class="badge conflict">${open} open</span>`:"<span class='badge supported'>All resolved</span>"}</p></div><div class="card"><b>Knowledge gaps</b><p>${gaps} open</p></div></div>${open?`<div class="callout">Resolve ${open} open conflict${open>1?"s":""} before approving.</div>`:`<div class="success">All required conflicts are resolved. The reviewer can approve the package.</div>`}<p class="note">Approval records reviewer role, timestamp, package version and status in the Audit Log.</p>`;
+ $("approve").disabled=open>0;
+}
+function roleSections(p){
+ const role=p.role.toLowerCase();
+ if(role.includes("engineer"))return [["WHAT YOU NEED TO KNOW",["Architecture and APIs","Database and deployment state","Technical risks and bugs","Active development tasks"]],["IMPORTANT DECISIONS",p.claims.filter(c=>c.type==="Decision").map(c=>c.title)],["ACTIVE WORK",p.claims.filter(c=>/Action|Risk|Dependency/i.test(c.type)).map(c=>c.title)]];
+ if(role.includes("product"))return [["WHAT YOU NEED TO KNOW",["Current project status","Milestones and deadlines","Business decisions","Risks and dependencies"]],["IMPORTANT DECISIONS",p.claims.filter(c=>c.type==="Decision").map(c=>c.title)],["ACTIVE WORK",p.claims.filter(c=>/Action|Dependency/i.test(c.type)).map(c=>c.title)]];
+ if(role.includes("lead"))return [["WHAT YOU NEED TO KNOW",["Major risks and conflicts","Ownership","Current status","Knowledge gaps"]],["IMPORTANT DECISIONS",p.claims.filter(c=>c.type==="Decision").map(c=>c.title)],["ACTIVE WORK",p.claims.map(c=>c.title).slice(0,6)]];
+ return [["WHAT YOU NEED TO KNOW",["Current state","Key decisions","Open risks and gaps"]],["IMPORTANT DECISIONS",p.claims.filter(c=>c.type==="Decision").map(c=>c.title)],["ACTIVE WORK",p.claims.map(c=>c.title).slice(0,6)]];
+}
+function renderPackage(){
+ const p=current();if(!p)return;
+ const sections=roleSections(p);
+ $("packageContent").innerHTML=`<div class="package-head"><small>${p.demo?"SYNTHETIC DEMO PROJECT":"CONTINUITY PACKAGE"}</small><h1>${esc(p.name)}</h1><span class="role-pill">Prepared for ${esc(p.role)}</span> <span class="badge ${p.approved?"supported":"single"}">${p.approved?"APPROVED":"DRAFT"}</span><p class="muted">${esc(p.desc)}</p></div>
+ <section><h2>CURRENT PROJECT STATE</h2><div class="state-grid">${p.state.map(s=>`<div class="state-item ${s.status}"><b>${esc(s.title)}</b><div class="small">${esc(s.detail)}</div></div>`).join("")}</div></section>
+ ${sections.map(s=>`<section><h2>${esc(s[0])}</h2><ul>${s[1].length?s[1].map(x=>`<li>${esc(x)}</li>`).join(""):"<li>No items recorded.</li>"}</ul></section>`).join("")}
+ <section><h2>RISKS</h2><ul>${p.claims.filter(c=>c.type==="Risk").map(c=>`<li>${esc(c.title)}</li>`).join("")||"<li>No explicit risks found.</li>"}</ul></section>
+ <section><h2>KNOWLEDGE GAPS</h2><ul>${p.gaps.map(g=>`<li>${esc(g.title)} — ${esc(g.status)}</li>`).join("")||"<li>No knowledge gaps.</li>"}</ul></section>
+ <section><h2>EVIDENCE</h2>${p.claims.flatMap(c=>c.evidence||[]).slice(0,12).map(e=>`<div class="ev"><b>${esc(e.src)}</b> · ${esc(e.loc)}<br>"${esc(e.quote)}"</div>`).join("")||"<p class='muted'>No evidence references.</p>"}</section>
+ <section><h2>NEXT STEPS</h2><div class="timeline"><div class="card"><h3>Day 1</h3><p>${esc(p.plan.day1)}</p></div><div class="card"><h3>Week 1</h3><p>${esc(p.plan.week1)}</p></div><div class="card"><h3>Month 1</h3><p>${esc(p.plan.month1)}</p></div></div></section>
+ <section><h2>REVIEW INFORMATION</h2><p>Approved by: ${p.approved?esc(p.role):"Pending reviewer approval"}</p><p>Version: ${esc(p.version)}</p><p>Approval status: ${p.approved?"Approved":"Draft"}</p></section>
+ <div class="row no-print"><button class="btn primary" id="printPackage">Print / Save as PDF</button><button class="btn" id="sharePackage">Copy Share Link</button></div>`;
+ $("printPackage").onclick=()=>window.print();
+ $("sharePackage").onclick=async()=>{const url=location.href.split("#")[0]+"#package="+encodeURIComponent(p.id);try{await navigator.clipboard.writeText(url);toast("Share link copied")}catch{toast(url)}logEvent("Package exported/shared")};
+}
+function renderAudit(){
+ const p=current();if(!p)return;
+ $("log").innerHTML=(p.audit||[]).map(e=>`<li><time>${esc(e.time)}</time>${esc(e.msg)}</li>`).join("")||"<li class='muted'>No audit events.</li>";
+}
+function renderAll(){renderDashboard();renderHeaderActions();if(current()){renderStats();renderState();renderClaims();renderPlan();renderSources();renderConflicts();renderGaps();renderReview();renderPackage();renderAudit()}}
+function addFiles(files){
+ state.newFiles=[...state.newFiles,...[...files].map(f=>({name:f.name,type:f.name.toLowerCase().endsWith(".json")?"JSON":f.name.toLowerCase().endsWith(".csv")?"CSV":f.name.toLowerCase().endsWith(".md")?"Markdown":"TXT",file:f}))];
+ $("newFiles").innerHTML=state.newFiles.map((f,i)=>`<div class="file-row"><span><b>${esc(f.name)}</b><span class="meta">${esc(f.type)}</span></span><button class="btn danger" data-new-remove="${i}">Remove</button></div>`).join("")||"<p class='note'>No sources selected.</p>";
+}
+async function makeProject(){
+ const name=$("newName").value.trim()||"Untitled Project",desc=$("newDesc").value.trim(),role=$("newRole").value;
+ if(!state.newFiles.length){toast("Add at least one project source before creating the project");return}
+ const sources=[];
+ for(const f of state.newFiles){sources.push({name:f.name,type:f.type,status:"Processing",items:0,content:await f.file.text()})}
+ const p=blankProject(name,desc,role,sources,false);state.projects.push(p);state.currentId=p.id;save();logEvent("Project created");startProcessing(p);
+}
+function startProcessing(p){
+ show("processing");const steps=["Reading sources","Parsing sources","Extracting knowledge","Identifying decisions","Identifying tasks","Linking evidence","Checking conflicts","Detecting knowledge gaps","Generating continuity draft"];let i=0;
+ $("processingSteps").innerHTML=steps.map((s,n)=>`<div class="step" id="proc${n}"><span class="step-dot">${n+1}</span><span>${s}</span></div>`).join("");
+ const timer=setInterval(()=>{if(i>0){$("proc"+(i-1)).classList.remove("active");$("proc"+(i-1)).classList.add("done")}if(i<steps.length){$("proc"+i).classList.add("active");$("progressBar").style.width=Math.round((i/steps.length)*100)+"%";i++}else{clearInterval(timer);$("progressBar").style.width="100%";p.sources.forEach(s=>s.status="Processed");analyseSources(p);p.audit.unshift({time:new Date().toLocaleString(),msg:"Analysis completed"});save();setTimeout(()=>show("overview"),450)}},260);
+}
+document.addEventListener("click",e=>{
+ const t=e.target.closest("button");if(!t)return;
+ if(t.dataset.view){show(t.dataset.view);return}
+ if(t.id==="newProjectBtn"){state.newFiles=[];$("newFiles").innerHTML="<p class='note'>No sources selected.</p>";show("new");return}
+ if(t.dataset.openProject){state.currentId=t.dataset.openProject;state.filter="all";save();show("overview");return}
+ if(t.id==="loadDemo"){const p=demoProject();state.projects.push(p);state.currentId=p.id;save();toast("Synthetic demo project loaded");show("overview");return}
+ if(t.id==="createProject"){makeProject();return}
+ if(t.dataset.newRemove){state.newFiles.splice(+t.dataset.newRemove,1);$("newFiles").innerHTML=state.newFiles.map((f,i)=>`<div class="file-row"><span><b>${esc(f.name)}</b><span class="meta">${esc(f.type)}</span></span><button class="btn danger" data-new-remove="${i}">Remove</button></div>`).join("")||"<p class='note'>No sources selected.</p>";return}
+ if(t.dataset.f){state.filter=t.dataset.f;renderClaims();return}
+ if(t.dataset.openConf){show("conflicts");return}
+ if(t.dataset.rule){const [id,...parts]=t.dataset.rule.split("|");const p=current(),c=p.conflicts.find(x=>x.id===id);c.ruling=parts.join("|");const claim=p.claims.find(x=>x.id===c.claimId);if(claim)claim.state="verified";logEvent(`Conflict resolved: "${c.title}" — ${c.ruling}`);save();renderAll();toast("Ruling saved to the audit log");return}
+ if(t.dataset.gap){const p=current(),g=p.gaps.find(x=>x.id===t.dataset.gap);g.status="Resolved";logEvent(`Knowledge gap resolved: ${g.title}`);save();renderAll();return}
+ if(t.dataset.gapUnknown){const p=current(),g=p.gaps.find(x=>x.id===t.dataset.gapUnknown);g.status="Still Unknown";logEvent(`Knowledge gap retained as unknown: ${g.title}`);save();renderAll();return}
+ if(t.dataset.removeSource){const p=current();p.sources=p.sources.filter(s=>s.id!==t.dataset.removeSource);logEvent("Source removed");save();renderAll();return}
+});
+$("fileInput").addEventListener("change",e=>addFiles(e.target.files));
+$("drop").addEventListener("dragover",e=>{e.preventDefault();$("drop").classList.add("drag")});
+$("drop").addEventListener("dragleave",()=>$("drop").classList.remove("drag"));
+$("drop").addEventListener("drop",e=>{e.preventDefault();$("drop").classList.remove("drag");addFiles(e.dataTransfer.files)});
+$("addMoreBtn").onclick=()=>{$("sourceInput").click()};
+$("sourceInput").addEventListener("change",async e=>{
+ const p=current();
+ if(!p)return;
+ const files=[...e.target.files];
+ for(const f of files){
+  const lower=f.name.toLowerCase();
+  const type=lower.endsWith(".json")?"JSON":lower.endsWith(".csv")?"CSV":lower.endsWith(".md")||lower.endsWith(".markdown")?"Markdown":"TXT";
+  p.sources.push({id:"s"+Date.now()+"_"+Math.random().toString(36).slice(2,6),name:f.name,type,status:"Processing",items:0,content:await f.text()});
+ }
+ p.sources.forEach(s=>{if(!s.status)s.status="Processed"});
+ if(!p.demo){
+  analyseSources(p);
+ }
+ p.sources.forEach(s=>{if(s.status==="Processing")s.status="Processed"});
+ logEvent(`${files.length} source${files.length===1?"":"s"} added`);
+ save();
+ renderAll();
+ toast(`${files.length} source${files.length===1?"":"s"} added`);
+ e.target.value="";
+});
+$("exitQuestionsBtn").onclick=()=>{const p=current();$("questions").innerHTML=p.gaps.map((g,i)=>`<li>${esc(g.title)}</li>`).join("")||"<li>No open questions.</li>";$("questionsCard").classList.remove("hidden");logEvent("Exit questions generated");toast("Exit questions generated")};
+$("approve").onclick=()=>{const p=current(),n=openConflicts();if(n){toast(`Resolve ${n} open conflict${n>1?"s":""} before approving`);show("conflicts");return}p.approved=true;p.version="1.0";logEvent(`Package approved for ${p.role}`);save();renderAll();show("package");toast("Continuity package approved")};
+
+if(!state.projects.length){const p=demoProject();state.projects.push(p);state.currentId=p.id;save()}
+if(location.hash.startsWith("#package=")){state.currentId=decodeURIComponent(location.hash.slice(9));show("package")}else{show(current()?"overview":"dashboard")}
+</script>
+</body>
+</html>
