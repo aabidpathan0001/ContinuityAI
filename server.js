@@ -32,18 +32,153 @@ const itemSchema=z.object({type:z.string().min(1),title:z.string().min(1),summar
 const aiSchema=z.object({items:z.array(itemSchema),gaps:z.array(z.string()).default([])});
 
 function chunksForSource(s){return s.content.split(/\r?\n/).map((x,i)=>({location:`line ${i+1}`,content:x.trim()})).filter(x=>x.content).slice(0,400)}
-function demoExtract(sources){
- const out=[]; const gaps=[]; const add=(type,title,summary,src,loc,quote,extra={})=>out.push({type,title,summary,confidence:.91,evidence:[{sourceId:src,location:loc,quote}],...extra});
- for(const s of sources){const lines=chunksForSource(s);for(const l of lines){const t=l.content;
-  if(/we will not store card data|hosted checkout|agreed/i.test(t))add('decision','Use hosted checkout instead of storing card data','Payment card data remains with the managed provider.',s.id,l.location,t);
-  if(/not idempotent|retry.*unresolved|retry failures/i.test(t))add('risk','Payment retry may not be idempotent','Payment retry behavior remains a production risk.',s.id,l.location,t,{severity:'high',impact:'Potential duplicate charge or failed retry',owner:'Rahul'});
-  if(/launch.*(\d{1,2} (?:april|may))/i.test(t)){const m=t.match(/(\d{1,2} (?:april|may))/i);add('milestone','Launch target',`Source states launch target ${m[1]}.`,s.id,l.location,t,{due_date:m[1]});}
-  if(/TODO|TBD|not recorded|who owns/i.test(t))gaps.push(t.replace(/^[-*\s]+/,''));
-  if(/blocked until|blocked/i.test(t))add('blocker','Release is blocked','Release depends on resolving the payment retry issue.',s.id,l.location,t);
-  if(/task|authentication|database schema|security testing|deployment/i.test(t)&&/done|pending|progress|in progress/i.test(t))add('task',t,'Task status extracted from project activity.',s.id,l.location,t);
- }}
- return {items:out,gaps:[...new Set(gaps)]};
+
+
+
+function demoExtract(sources) {
+  const items = [];
+  const gaps = [];
+
+  const add = (type, title, summary, source, line, extra = {}) => {
+    items.push({
+      type,
+      title,
+      summary,
+      confidence: 0.85,
+      owner: extra.owner || null,
+      due_date: extra.due_date || null,
+      severity: extra.severity || null,
+      impact: extra.impact || null,
+      mitigation: extra.mitigation || null,
+      evidence: [{
+        sourceId: source.id,
+        location: line.location,
+        quote: line.content.slice(0, 500)
+      }]
+    });
+  };
+
+  const seen = new Set();
+
+  for (const source of sources) {
+    const lines = chunksForSource(source);
+
+    for (const line of lines) {
+      const text = line.content;
+      const lower = text.toLowerCase();
+
+      // Ignore very short or irrelevant lines.
+      if (text.length < 8) continue;
+
+      // Decisions
+      if (
+        /\b(decision|decided|agreed|we will use|we will not|chosen|selected|approved|adopted)\b/i.test(text)
+      ) {
+        add(
+          'decision',
+          'Project decision',
+          text,
+          source,
+          line
+        );
+      }
+
+      // Tasks with explicit status.
+      if (
+        /\b(done|completed|pending|in progress|in-progress|not started|assigned|ongoing)\b/i.test(text) &&
+        /\b(task|authentication|database|security|deployment|testing|integration|design|development|backup|email|payment|refund|monitoring|documentation|api|frontend|backend)\b/i.test(text)
+      ) {
+        const ownerMatch = text.match(/\b(?:owner|assigned to|assignee)\s*[:=-]?\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
+
+        add(
+          'task',
+          'Project task',
+          text,
+          source,
+          line,
+          { owner: ownerMatch ? ownerMatch[1] : null }
+        );
+      }
+
+      // Risks
+      if (
+        /\b(risk|risky|may fail|could fail|vulnerable|unverified|not tested|not configured|not connected|not approved|incomplete|uncertain|potential issue)\b/i.test(text)
+      ) {
+        add(
+          'risk',
+          'Identified project risk',
+          text,
+          source,
+          line,
+          {
+            severity: /\b(critical|high|major)\b/i.test(text) ? 'high' : 'medium',
+            impact: 'Requires review by the incoming project owner.'
+          }
+        );
+      }
+
+      // Blockers
+      if (
+        /\b(blocked|blocking|waiting for|waiting on|cannot proceed|unable to proceed|depends on approval)\b/i.test(text)
+      ) {
+        add(
+          'blocker',
+          'Project blocker',
+          text,
+          source,
+          line,
+          { severity: 'high' }
+        );
+      }
+
+      // Milestones and dates
+      if (
+        /\b(launch|release|beta|deadline|milestone|delivery|go-live|review)\b/i.test(text) &&
+        /\b\d{1,2}\b|\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b|\b(?:next week|next month|end of month)\b/i.test(text)
+      ) {
+        const dateMatch = text.match(/\b\d{1,2}\s+(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b/i);
+
+        add(
+          'milestone',
+          'Project milestone',
+          text,
+          source,
+          line,
+          { due_date: dateMatch ? dateMatch[0] : null }
+        );
+      }
+
+      // Open questions and knowledge gaps.
+      if (
+        /\?/.test(text) ||
+        /\b(TODO|TBD|not decided|not recorded|unknown|who owns|owner not assigned|needs confirmation|not yet determined|awaiting confirmation)\b/i.test(text)
+      ) {
+        const gap = text.replace(/^[-*\s]+/, '');
+
+        if (!seen.has(gap)) {
+          gaps.push(gap);
+          seen.add(gap);
+        }
+
+        add(
+          'question',
+          'Open project question',
+          text,
+          source,
+          line
+        );
+      }
+    }
+  }
+
+  return {
+    items,
+    gaps: [...new Set(gaps)].slice(0, 30)
+  };
 }
+
+
+
 async function aiExtract(sources){
  if(!process.env.AI_API_KEY)return demoExtract(sources);
  const sourceText=sources.map(s=>`SOURCE_ID: ${s.id}\nSOURCE: ${s.name}\n${s.content.slice(0,12000)}`).join('\n\n---\n\n');
