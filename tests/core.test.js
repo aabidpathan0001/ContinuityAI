@@ -1,0 +1,3 @@
+const test=require('node:test');const assert=require('node:assert/strict');const {demoExtract,health}=require('../server');
+test('demo extractor preserves evidence',()=>{const s=[{id:'s1',name:'m.md',content:'Decision: use hosted checkout.\nRisk: retry is not idempotent.'}];const r=demoExtract(s);assert.ok(r.items.length>=2);assert.ok(r.items.every(x=>x.evidence?.length));});
+test('health score reacts to conflicts and gaps',()=>{const a=health({items:10,evidenced:10,open_conflicts:0,open_gaps:0,unverified:0,unassigned:0});const b=health({items:10,evidenced:5,open_conflicts:2,open_gaps:4,unverified:3,unassigned:2});assert.ok(a.score>b.score);});

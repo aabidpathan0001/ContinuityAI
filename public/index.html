@@ -1,0 +1,752 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ContinuityAI — Living project continuity</title><style>
+:root{
+  --bg:#F6F8FB;
+  --bg-soft:#F8FAFD;
+  --card:#FFFFFF;
+  --card-hover:#FCFDFF;
+  --text:#172033;
+  --muted:#667085;
+  --primary:#2563EB;
+  --primary-dark:#1D4ED8;
+  --accent:#60A5FA;
+  --accent-soft:#EFF6FF;
+  --border:#E2E8F0;
+  --border-strong:#CBD5E1;
+  --success:#16A34A;
+  --success-bg:#ECFDF3;
+  --danger:#DC2626;
+  --danger-bg:#FEF2F2;
+  --warning:#D97706;
+  --warning-bg:#FFFBEB;
+  --purple:#7C3AED;
+  --purple-bg:#F5F3FF;
+  --shadow:0 1px 2px rgba(15,23,42,.03),0 8px 28px rgba(15,23,42,.055);
+  --shadow-hover:0 8px 30px rgba(37,99,235,.10);
+  --radius:16px;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font:14px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 82% 0%,rgba(96,165,250,.08),transparent 28%),
+    radial-gradient(circle at 15% 100%,rgba(37,99,235,.035),transparent 25%);
+  z-index:-1;
+}
+
+.hidden{display:none!important}
+
+button,input,select{font:inherit}
+
+button{transition:all .18s ease}
+
+.app{
+  min-height:100vh;
+  display:flex;
+  background:var(--bg);
+}
+
+/* Sidebar */
+.side{
+  width:248px;
+  flex:0 0 248px;
+  background:rgba(255,255,255,.92);
+  border-right:1px solid var(--border);
+  color:var(--text);
+  padding:22px 14px;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  position:sticky;
+  top:0;
+  height:100vh;
+  backdrop-filter:blur(14px);
+}
+
+.brand{
+  font-size:21px;
+  font-weight:800;
+  letter-spacing:-.045em;
+  color:var(--text);
+  padding:4px 12px 2px;
+}
+
+.brand:before{
+  content:"∞";
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:28px;
+  height:28px;
+  margin-right:8px;
+  border-radius:8px;
+  color:var(--primary);
+  background:var(--accent-soft);
+  font-size:25px;
+  font-weight:700;
+  vertical-align:-4px;
+}
+
+.tag{
+  font-size:11px;
+  color:#8A94A6;
+  padding:0 12px 18px;
+  letter-spacing:.02em;
+}
+
+.nav{
+  border:1px solid transparent;
+  background:transparent;
+  color:#475467;
+  text-align:left;
+  padding:11px 13px;
+  border-radius:11px;
+  cursor:pointer;
+  font-weight:600;
+  position:relative;
+}
+
+.nav:hover{
+  background:#F8FAFC;
+  color:var(--text);
+}
+
+.nav.active{
+  background:var(--accent-soft);
+  color:var(--primary);
+  border-color:#DBEAFE;
+  box-shadow:inset 3px 0 0 var(--primary);
+}
+
+.nav.active:after{
+  content:"";
+  position:absolute;
+  right:12px;
+  top:50%;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--primary);
+  transform:translateY(-50%);
+  box-shadow:0 0 10px rgba(37,99,235,.45);
+}
+
+.nav#logout{
+  margin-top:auto;
+  color:#667085;
+}
+
+/* Main */
+.main{
+  flex:1;
+  padding:30px 38px 48px;
+  min-width:0;
+  max-width:1600px;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:center;
+  margin-bottom:28px;
+  padding-bottom:20px;
+  border-bottom:1px solid rgba(226,232,240,.75);
+}
+
+.top h1{
+  margin:2px 0 0;
+  color:var(--text);
+  font-size:28px;
+  line-height:1.2;
+  letter-spacing:-.035em;
+}
+
+.top small{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.01em;
+}
+
+.actions,.row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.btn{
+  min-height:42px;
+  padding:0 15px;
+  border:1px solid var(--border-strong);
+  border-radius:10px;
+  background:#fff;
+  color:#344054;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 1px 1px rgba(15,23,42,.02);
+}
+
+.btn:hover{
+  border-color:#B8C5D6;
+  background:#F8FAFC;
+  transform:translateY(-1px);
+}
+
+.btn.primary{
+  background:var(--primary);
+  border-color:var(--primary);
+  color:#fff;
+  box-shadow:0 6px 16px rgba(37,99,235,.18),0 0 0 1px rgba(37,99,235,.04);
+}
+
+.btn.primary:hover{
+  background:var(--primary-dark);
+  border-color:var(--primary-dark);
+  box-shadow:0 8px 20px rgba(37,99,235,.24),0 0 18px rgba(96,165,250,.12);
+}
+
+.btn.danger{
+  color:var(--danger);
+  border-color:#FECACA;
+  background:#fff;
+}
+
+.btn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+  transform:none;
+}
+
+/* Cards */
+.card{
+  background:rgba(255,255,255,.96);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:var(--shadow);
+  transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+
+.card:hover{
+  border-color:#D7E0EB;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:16px;
+}
+
+.stat{
+  min-height:116px;
+  position:relative;
+  overflow:hidden;
+}
+
+.stat:after{
+  content:"";
+  position:absolute;
+  width:110px;
+  height:110px;
+  right:-45px;
+  bottom:-55px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(96,165,250,.12),transparent 70%);
+}
+
+.stat b{
+  display:block;
+  font-size:30px;
+  line-height:1.1;
+  letter-spacing:-.035em;
+  color:var(--text);
+  margin-bottom:7px;
+}
+
+.stat span{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:600;
+}
+
+.two{
+  display:grid;
+  grid-template-columns:minmax(0,2fr) minmax(300px,1fr);
+  gap:18px;
+}
+
+.list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.section{margin-top:18px}
+
+.section h2{
+  margin:0 0 10px;
+  color:var(--text);
+  font-size:17px;
+  letter-spacing:-.015em;
+}
+
+.muted{color:var(--muted)}
+.small{font-size:12px}
+
+/* Badges */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:4px 9px;
+  border-radius:999px;
+  font-size:11px;
+  line-height:1;
+  font-weight:800;
+  border:1px solid transparent;
+}
+
+.verified{
+  background:var(--success-bg);
+  color:#15803D;
+  border-color:#BBF7D0;
+}
+
+.conflict{
+  background:var(--danger-bg);
+  color:#B91C1C;
+  border-color:#FECACA;
+}
+
+.open{
+  background:var(--warning-bg);
+  color:#B45309;
+  border-color:#FDE68A;
+}
+
+.ai{
+  background:var(--accent-soft);
+  color:var(--primary);
+  border-color:#BFDBFE;
+}
+
+/* Knowledge/source items */
+.source{
+  padding:16px;
+  border:1px solid var(--border);
+  border-radius:13px;
+  background:#fff;
+  box-shadow:0 1px 2px rgba(15,23,42,.025);
+  transition:all .18s ease;
+}
+
+.source:hover{
+  border-color:#BFDBFE;
+  box-shadow:var(--shadow-hover);
+  transform:translateY(-1px);
+}
+
+.source h3{
+  letter-spacing:-.02em;
+}
+
+.ev{
+  background:#F8FAFC;
+  border:1px solid #E8EEF5;
+  border-left:3px solid var(--accent);
+  border-radius:10px;
+  padding:11px 12px;
+  margin-top:9px;
+  font-size:12px;
+  color:#475467;
+}
+
+/* Health */
+.health{
+  display:flex;
+  align-items:center;
+  gap:22px;
+  padding:4px;
+}
+
+.score{
+  width:96px;
+  height:96px;
+  flex:0 0 96px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:
+    radial-gradient(circle at center,#fff 58%,transparent 59%),
+    conic-gradient(
+      var(--primary) 0 calc(var(--score, 0) * 1%),
+      #E8EEF7 calc(var(--score, 0) * 1%) 100%
+    );
+  color:var(--primary);
+  font-size:25px;
+  font-weight:900;
+  box-shadow:
+    0 0 0 8px #F8FAFC,
+    0 0 25px rgba(37,99,235,.12);
+}
+
+.progress{
+  height:8px;
+  background:#EAF0F7;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.progress i{
+  display:block;
+  height:100%;
+  background:linear-gradient(90deg,var(--primary),var(--accent));
+  border-radius:999px;
+  box-shadow:0 0 12px rgba(37,99,235,.25);
+}
+
+/* Inputs */
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom:13px;
+}
+
+.field label{
+  font-weight:700;
+  color:var(--text);
+  font-size:13px;
+}
+
+input,select{
+  min-height:43px;
+  border:1px solid var(--border-strong);
+  border-radius:10px;
+  padding:0 12px;
+  background:#fff;
+  color:var(--text);
+  outline:none;
+  transition:border-color .16s,box-shadow .16s;
+}
+
+input::placeholder{color:#98A2B3}
+
+input:focus,select:focus{
+  border-color:#93C5FD;
+  box-shadow:0 0 0 3px rgba(37,99,235,.09);
+}
+
+/* Upload */
+.drop{
+  border:1.5px dashed #B8C7D9;
+  border-radius:13px;
+  padding:27px 24px;
+  text-align:center;
+  background:linear-gradient(180deg,#FCFDFF,#F8FAFC);
+  transition:all .18s ease;
+}
+
+.drop:hover{
+  border-color:#60A5FA;
+  background:#F8FBFF;
+  box-shadow:0 0 20px rgba(96,165,250,.08);
+}
+
+/* Login */
+.login{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  background:
+    radial-gradient(circle at 80% 10%,rgba(96,165,250,.16),transparent 28%),
+    radial-gradient(circle at 15% 90%,rgba(37,99,235,.08),transparent 28%),
+    var(--bg);
+}
+
+.loginbox{
+  width:min(470px,100%);
+}
+
+.loginbox h1,.loginbox h2{
+  letter-spacing:-.035em;
+}
+
+.hero{
+  padding:27px;
+  background:linear-gradient(135deg,#FFFFFF 0%,#F1F6FF 100%);
+  color:var(--text);
+  border:1px solid #DCE8F8;
+  border-radius:18px;
+  margin-bottom:16px;
+  box-shadow:0 16px 45px rgba(37,99,235,.08);
+  position:relative;
+  overflow:hidden;
+}
+
+.hero:after{
+  content:"";
+  position:absolute;
+  width:190px;
+  height:190px;
+  right:-90px;
+  top:-100px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(96,165,250,.22),transparent 68%);
+}
+
+.hero h2{
+  margin:0 0 7px;
+  font-size:26px;
+}
+
+.hero p{
+  margin:0;
+  color:#667085;
+}
+
+/* Table */
+.table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.table th,.table td{
+  padding:11px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+}
+
+.table th{
+  color:#667085;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+
+/* Search */
+.search{
+  width:310px;
+  background:#fff;
+}
+
+/* Toast */
+.toast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translate(-50%,10px);
+  background:#172033;
+  color:#fff;
+  padding:11px 16px;
+  border-radius:10px;
+  box-shadow:0 10px 30px rgba(15,23,42,.18);
+  opacity:0;
+  transition:.2s;
+  z-index:99;
+  pointer-events:none;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+/* Print */
+@media print{
+  .side,.top,.btn,.actions{display:none!important}
+  .main{padding:0}
+  .card{box-shadow:none}
+}
+
+/* Responsive */
+@media(max-width:1100px){
+  .side{width:220px;flex-basis:220px}
+  .main{padding:24px}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .two{grid-template-columns:1fr}
+}
+
+@media(max-width:760px){
+  .app{display:block}
+  .side{
+    width:auto;
+    height:auto;
+    position:relative;
+    flex-direction:row;
+    flex-wrap:wrap;
+    padding:14px;
+    border-right:0;
+    border-bottom:1px solid var(--border);
+  }
+
+  .brand,.tag{width:100%}
+  .brand{padding-bottom:2px}
+  .tag{padding-bottom:10px}
+
+  .nav{
+    flex:1 1 calc(50% - 8px);
+    min-width:130px;
+  }
+
+  .nav#logout{margin-top:0}
+
+  .main{padding:18px}
+  .grid{grid-template-columns:1fr 1fr}
+  .search{width:100%}
+
+  .top{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .health{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
+
+@media(max-width:500px){
+  .grid{grid-template-columns:1fr}
+  .nav{flex-basis:100%}
+  .main{padding:14px}
+  .card{padding:16px}
+}
+</style></head><body><div id="login" class="login"><div class="loginbox"><div class="hero"><h2>ContinuityAI</h2><p>Evidence-backed, continuously updated project memory for handover.</p></div><div class="card"><h2>Judge / Demo access</h2><p class="muted">Use the built-in demo account. No external accounts are required.</p><div class="field"><label>Email</label><input id="email" value="demo@continuityai.app"></div><div class="field"><label>Password</label><input id="password" type="password" value="Demo@123456"></div><div class="row"><button class="btn primary" id="loginBtn">Sign in</button><button class="btn" id="demoBtn">Try Demo Project</button></div><p class="small muted" id="loginMsg"></p></div></div></div>
+<div id="app" class="app hidden"><nav class="side"><div class="brand">ContinuityAI</div><div class="tag">Living project continuity</div><button class="nav active" data-view="dashboard">Dashboard</button><button class="nav" data-view="knowledge">Knowledge Explorer</button><button class="nav" data-view="sources">Sources & Integrations</button><button class="nav" data-view="conflicts">Conflict Center</button><button class="nav" data-view="gaps">Knowledge Gaps</button><button class="nav" data-view="package">Continuity Package</button><button class="nav" data-view="audit">Audit Log</button><button class="nav" id="logout">Sign out</button></nav><main class="main"><header class="top"><div><small id="projectSub">Workspace</small><h1 id="title">Projects</h1></div><div class="actions" id="topActions"></div></header>
+<section id="view-dashboard"><div class="actions" style="justify-content:space-between;margin-bottom:14px"><div><h2 style="margin:0;color:var(--navy)">Projects</h2><span class="muted">Connect → Reconstruct → Verify → Review → Continue</span></div><div class="actions"><button class="btn" id="demoSeed">Load demo project</button><button class="btn primary" id="newProject">New project</button></div></div><div id="projectList" class="list"></div></section>
+<section id="view-project" class="hidden"><div id="stats" class="grid"></div><div class="two section"><div><div class="card" id="healthCard"></div><div class="card section"><div class="actions" style="justify-content:space-between"><h2 style="margin:0">Recent knowledge</h2><button class="btn" id="analyzeBtn">Analyze / refresh sources</button></div><div id="recent" class="list" style="margin-top:12px"></div></div></div><aside><div class="card"><h2>Continuation plan</h2><div id="plan"></div></div><div class="card section"><h2>Round 3 improvements</h2><p>✓ Real AI extraction</p><p>✓ Connector-based source ingestion</p><p>✓ Living knowledge + change detection</p></div></aside></div></section>
+<section id="view-knowledge" class="hidden"><div class="actions" style="justify-content:space-between"><h2>Knowledge Explorer</h2><input id="search" class="search" placeholder="Search evidence-backed knowledge"></div><div id="knowledgeList" class="list section"></div></section>
+<section id="view-sources" class="hidden"><div class="card">
+
+
+<div class="actions" style="justify-content:space-between;align-items:flex-start">
+  <div>
+    <h2 style="margin:0">Sources</h2>
+    <p class="muted" style="margin:5px 0 0">
+      Project evidence used to reconstruct and maintain continuity.
+    </p>
+  </div>
+  <span class="badge ai">Evidence-backed</span>
+</div>
+
+
+<div class="drop"><input id="files" type="file" multiple accept=".txt,.md,.markdown,.csv,.json"><p class="small muted">Supported: TXT, Markdown, CSV, JSON · Up to 25 MB per file</p></div><div class="row"><button class="btn primary" id="uploadBtn">Add sources</button><button class="btn" id="analyze2">Analyze with AI</button></div><div id="sourceList" class="list section"></div></div><div class="card section"><h2>GitHub connector</h2><p class="muted">Imports repository metadata, issues and recent commits as project evidence. A GitHub token is optional for public repositories and remains server-side.</p><div class="row"><input id="ghOwner" placeholder="owner"><input id="ghRepo" placeholder="repository"><button class="btn" id="ghSync">Sync GitHub</button></div></div></section>
+<section id="view-conflicts" class="hidden"><div class="card"><h2>Conflict Center</h2><p class="muted">ContinuityAI never silently picks a winner.</p><div id="conflictList" class="list"></div></div></section>
+<section id="view-gaps" class="hidden"><div class="card"><h2>Knowledge Gaps</h2><p class="muted">Unknown information stays unknown until someone verifies it.</p><div id="gapList" class="list"></div><div class="section"><button class="btn" id="questions">Generate exit questions</button><ol id="questionList"></ol></div></div></section>
+<section id="view-package" class="hidden"><div class="actions"><button class="btn" onclick="window.print()">Print / Save as PDF</button><button class="btn" id="refreshPackage">Refresh package</button></div><article id="package" class="card section"></article></section>
+<section id="view-audit" class="hidden"><div class="card"><h2>Audit Log</h2><div id="audit"></div></div></section>
+<section id="view-new" class="hidden"><div class="card" style="max-width:650px"><h2>New Project</h2><div class="field"><label>Name</label><input id="newName" placeholder="E-Commerce Platform"></div><div class="field"><label>Description</label><input id="newDesc" placeholder="Project handover and continuity workspace"></div><div class="field"><label>Recipient role</label><select id="newRole"><option>Incoming Engineer</option><option>Product Manager</option><option>Team Lead</option><option>Designer</option><option>Other</option></select></div><div class="row"><button class="btn primary" id="createProject">Create project</button><button class="btn" id="cancelNew">Cancel</button></div></div></section>
+</main></div><div id="toast" class="toast"></div><script>
+let token=sessionStorage.getItem('ca_token')||'',projects=[],current=null,bundle=null;
+const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function toast(x){$('toast').textContent=x;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2400)}
+async function api(url,opt={}){opt.headers=opt.headers||{};if(token)opt.headers.Authorization='Bearer '+token;const r=await fetch(url,opt);const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||'Request failed');return d}
+async function login(demo=false){$('loginMsg').textContent='';try{const d=await api(demo?'/api/auth/demo':'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:demo?'{}':JSON.stringify({email:$('email').value,password:$('password').value})});token=d.token;sessionStorage.setItem('ca_token',token);$('login').classList.add('hidden');$('app').classList.remove('hidden');await loadProjects();}catch(e){$('loginMsg').textContent=e.message}}
+function show(v){document.querySelectorAll('main section[id^="view-"]').forEach(x=>x.classList.add('hidden'));$('view-'+v).classList.remove('hidden');document.querySelectorAll('.nav[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===v));if(v==='dashboard')renderProjects();if(v==='project')renderProject();if(v==='knowledge')renderKnowledge();if(v==='sources')renderSources();if(v==='conflicts')renderConflicts();if(v==='gaps')renderGaps();if(v==='package')loadPackage();if(v==='audit')renderAudit()}
+async function loadProjects(){const d=await api('/api/projects');projects=d.projects;renderProjects();if(!projects.length){show('new')}else openProject(projects[0].id)}
+function renderProjects(){$('projectList').innerHTML=projects.length?projects.map(p=>`<div class="card"><div class="actions" style="justify-content:space-between"><div><h3 style="margin:0;color:var(--navy)">${esc(p.name)}</h3><div class="muted">${esc(p.description)}</div></div><span class="badge ${p.approved?'verified':'open'}">${p.approved?'Approved':'In review'}</span></div><p class="small muted">${p.source_count} sources · ${p.knowledge_count} knowledge items · ${p.open_conflicts} open conflicts</p><button class="btn" onclick="openProject('${p.id}')">Open project</button></div>`).join(''):'<div class="card muted">No projects yet. Click Try Demo Project or create one.</div>'}
+async function openProject(id){current=projects.find(p=>p.id===id)||{id};const d=await api('/api/projects/'+id);current=d.project;bundle=d.bundle;$('projectSub').textContent=current.name;$('title').textContent='Project dashboard';show('project')}
+function renderProject(){if(!bundle)return;$('stats').innerHTML=[[bundle.items.length,'Knowledge items'],[bundle.items.filter(x=>x.status==='verified').length,'Verified'],[bundle.conflicts.filter(x=>x.status==='open').length,'Open conflicts'],[bundle.gaps.filter(x=>x.status==='open').length,'Knowledge gaps']].map(x=>`<div class="card stat"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('');$('healthCard').innerHTML=`<div class="health">
+
+<div class="score" style="--score:${bundle.health.score}">
+  ${bundle.health.score}
+</div>
+
+<div><h2 style="margin:0">Continuity Health</h2><p class="muted">Evidence coverage ${bundle.health.evidence_coverage}% · ${bundle.health.open_conflicts} conflicts · ${bundle.health.knowledge_gaps} gaps · ${bundle.health.unverified} unverified</p><div class="progress"><i style="width:${bundle.health.score}%"></i></div></div></div>`;$('recent').innerHTML=bundle.items.slice(0,8).map(itemCard).join('')||'<div class="muted">Analyze sources to reconstruct project knowledge.</div>';$('plan').innerHTML='<p><b>Today</b><br>Resolve high-risk conflicts and verify recent activity.</p><p><b>This week</b><br>Close the highest-impact knowledge gaps and confirm ownership.</p><p><b>Next snapshot</b><br>Refresh after meaningful project activity.</p>'}
+function itemCard(i){return `<div class="source"><div class="actions" style="justify-content:space-between"><div><span class="badge ai">${esc(i.type)}</span> <span class="badge ${i.status==='verified'?'verified':'open'}">${i.status}</span></div><span class="small muted">confidence ${Math.round(Number(i.confidence)*100)}%</span></div><h3 style="margin:7px 0;color:var(--navy)">${esc(i.title)}</h3><p>${esc(i.summary)}</p>${i.owner?`<p class="small"><b>Owner:</b> ${esc(i.owner)}</p>`:''}${i.evidence.slice(0,2).map(e=>`<div class="ev"><b>${esc(e.source_name)}</b> · ${esc(e.location)}<br>“${esc(e.quote)}”</div>`).join('')} ${i.status!=='verified'?`<div class="row"><button class="btn" onclick="verify('${i.id}')">Mark verified</button></div>`:''}</div>`}
+async function verify(id){try{await api('/api/knowledge/'+id+'/verify',{method:'POST'});await reload();toast('Knowledge verified')}catch(e){toast(e.message)}}
+async function reload(){const d=await api('/api/projects/'+current.id);current=d.project;bundle=d.bundle;renderProject();renderKnowledge();renderSources();renderConflicts();renderGaps();renderAudit()}
+function renderKnowledge(){if(!bundle)return;const s=($('search').value||'').toLowerCase();let a=bundle.items;if(s)a=a.filter(i=>JSON.stringify(i).toLowerCase().includes(s));$('knowledgeList').innerHTML=a.map(itemCard).join('')||'<div class="card muted">No matching evidence-backed knowledge.</div>'}
+
+
+function renderSources(){
+  if(!bundle)return;
+
+  $('sourceList').innerHTML=bundle.sources.map(s=>`
+    <div class="source">
+      <div class="actions" style="justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="row" style="gap:7px">
+            <b>${esc(s.name)}</b>
+            <span class="badge ${s.origin==='github'?'ai':''}">
+              ${esc(s.origin)}
+            </span>
+          </div>
+
+          <div class="small muted" style="margin-top:5px">
+            ${esc(s.source_type)} · ${esc(s.status)}
+            ${s.created_at ? ` · added ${new Date(s.created_at).toLocaleDateString()}` : ''}
+          </div>
+        </div>
+
+        <button
+          class="btn danger"
+          onclick="removeSource('${s.id}','${esc(s.name).replace(/'/g,"&#39;")}')">
+          Remove
+        </button>
+      </div>
+    </div>
+  `).join('') || `
+    <div class="card muted">
+      No sources yet. Upload a project document or connect GitHub to begin reconstructing project knowledge.
+    </div>
+  `;
+}
+
+
+function renderConflicts(){if(!bundle)return;const a=bundle.conflicts.filter(c=>c.status==='open');$('conflictList').innerHTML=a.length?a.map(c=>`<div class="source"><span class="badge conflict">OPEN CONFLICT</span><h3>${esc(c.title)}</h3><div class="two"><div><b>Previous knowledge</b><pre style="white-space:pre-wrap">${esc(JSON.stringify(c.previous_value,null,2))}</pre></div><div><b>New evidence</b><pre style="white-space:pre-wrap">${esc(JSON.stringify(c.new_value,null,2))}</pre></div></div><div class="row"><button class="btn" onclick="resolve('${c.id}','accept_previous')">Accept previous</button><button class="btn primary" onclick="resolve('${c.id}','accept_new')">Accept new</button><button class="btn" onclick="resolve('${c.id}','manual')">Mark resolved manually</button></div></div>`).join(''):'<div class="muted">No open conflicts. New contradictions will appear here instead of silently overwriting history.</div>'}
+async function resolve(id,resolution){try{await api('/api/conflicts/'+id+'/resolve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resolution})});await reload();toast('Conflict recorded in audit log')}catch(e){toast(e.message)}}
+function renderGaps(){if(!bundle)return;const a=bundle.gaps.filter(g=>g.status==='open');$('gapList').innerHTML=a.length?a.map(g=>`<div class="source"><span class="badge open">OPEN GAP</span><h3>${esc(g.title)}</h3><p class="muted">Not established by authorised sources.</p></div>`).join(''):'<div class="muted">No open gaps.</div>'}
+function renderAudit(){if(!bundle)return;$('audit').innerHTML=bundle.audit.map(a=>`<div class="source"><b>${esc(a.action)}</b><div class="small muted">${new Date(a.created_at).toLocaleString()}</div><pre style="white-space:pre-wrap">${esc(JSON.stringify(a.details||{},null,2))}</pre></div>`).join('')||'<div class="muted">No audit events.</div>'}
+async function loadPackage(){if(!current)return;try{const d=await api('/api/projects/'+current.id+'/continuity-package');const p=d.package;$('package').innerHTML=`<div class="hero"><h2>${esc(p.project.name)}</h2><p>${esc(p.executive_summary)}</p></div><h2>Continuity Health</h2><p><b>${p.health.score}/100</b> · evidence ${p.health.evidence_coverage}% · ${p.health.open_conflicts} conflicts · ${p.health.knowledge_gaps} gaps</p><h2>What You Need To Know</h2>${p.what_you_need_to_know.map(itemCard).join('')||'<p>No verified highlights yet.</p>'}<h2>Current State</h2><ul>${p.current_state.map(x=>`<li><b>${esc(x.type)}:</b> ${esc(x.title)}</li>`).join('')||'<li>No task/blocker data.</li>'}</ul><h2>Decisions</h2><ul>${p.decisions.map(x=>`<li>${esc(x.title)} — ${esc(x.summary)}</li>`).join('')||'<li>None extracted.</li>'}</ul><h2>Risks & Blockers</h2><ul>${p.risks.map(x=>`<li>${esc(x.title)} ${x.owner?'— owner '+esc(x.owner):''}</li>`).join('')||'<li>None extracted.</li>'}</ul><h2>Knowledge Gaps</h2><ul>${p.gaps.map(x=>`<li>${esc(x.title)}</li>`).join('')||'<li>None.</li>'}</ul><h2>Next Steps</h2><ol>${p.next_steps.map(x=>`<li>${esc(x)}</li>`).join('')||'<li>Verify the latest project state.</li>'}</ol><h2>Evidence</h2>${p.evidence.map(e=>`<div class="ev"><b>${esc(e.source_name)}</b> · ${esc(e.location)}<br>“${esc(e.quote)}”</div>`).join('')}` }catch(e){toast(e.message)}}
+
+
+async function upload(){if(!current)return;const fs=[...$('files').files];if(!fs.length)return toast('First click on \'Choose Files\' button ,and choose one or more files');const fd=new FormData();fs.forEach(f=>fd.append('files',f));try{await api('/api/projects/'+current.id+'/sources',{method:'POST',body:fd});$('files').value='';await reload();toast('Sources added')}catch(e){toast(e.message)}}
+
+async function removeSource(id,name){
+  const confirmed=confirm(
+    `Remove "${name}"?\n\n`+
+    `This will remove the source and any unverified knowledge that depends only on it.\n\n`+
+    `Verified knowledge will be protected.`
+  );
+
+  if(!confirmed)return;
+
+  try{
+    const d=await api(
+      `/api/projects/${current.id}/sources/${id}`,
+      {method:'DELETE'}
+    );
+
+    await reload();
+
+    toast(d.message||'Source removed');
+  }catch(e){
+    toast(e.message);
+  }
+}
+
+
+async function analyze(){try{await api('/api/projects/'+current.id+'/analyze',{method:'POST'});await reload();toast('Analysis complete')}catch(e){toast(e.message)}}
+async function seed(){try{if(!current){if(!projects.length){const d=await api('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'E-Commerce Platform',description:'Synthetic CodeFrontier judge project',role:'Incoming Engineer'})});await loadProjects();current=projects.find(p=>p.id===d.project.id)}}await api('/api/projects/'+current.id+'/demo-seed',{method:'POST'});await reload();await analyze();show('project')}catch(e){toast(e.message)}}
+$('loginBtn').onclick=()=>login(false);$('demoBtn').onclick=()=>login(true);$('logout').onclick=()=>{sessionStorage.removeItem('ca_token');location.reload()};$('newProject').onclick=()=>show('new');$('cancelNew').onclick=()=>show('dashboard');$('createProject').onclick=async()=>{try{const d=await api('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:$('newName').value,description:$('newDesc').value,role:$('newRole').value})});await loadProjects();openProject(d.project.id)}catch(e){toast(e.message)}};$('demoSeed').onclick=seed;$('analyzeBtn').onclick=analyze;$('analyze2').onclick=analyze;$('uploadBtn').onclick=upload;$('search').oninput=renderKnowledge;$('questions').onclick=()=>{$('questionList').innerHTML=[...bundle.gaps.filter(g=>g.status==='open').map(g=>`<li>${esc(g.title)}?</li>`),...bundle.conflicts.filter(c=>c.status==='open').map(c=>`<li>Which source should govern: ${esc(c.title)}?</li>`)].join('')||'<li>No unresolved questions.</li>'};$('ghSync').onclick=async()=>{try{await api('/api/integrations/github/sync',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({owner:$('ghOwner').value,repo:$('ghRepo').value})});await reload();toast('GitHub evidence imported')}catch(e){toast(e.message)}};$('refreshPackage').onclick=loadPackage;document.querySelectorAll('.nav[data-view]').forEach(b=>b.onclick=()=>show(b.dataset.view));
+if(token){$('login').classList.add('hidden');$('app').classList.remove('hidden');loadProjects().catch(()=>{sessionStorage.removeItem('ca_token');location.reload()})}
+</script></body></html>

@@ -1,0 +1,11 @@
+Project: Resin Website
+
+Decision: The team will use PostgreSQL for the production database.
+
+Task: Aabid will complete the authentication module by 20 November.
+
+Risk: Payment retries are not currently idempotent and may create duplicate transactions.
+
+Blocker: The production deployment is waiting for database credentials.
+
+Open question: Who will own the production database after handover?
